@@ -1,0 +1,10 @@
+{
+	"app_name": "livechat demo",
+	"base_url": "http://localhost:8090",
+	"port": 8090,
+	"verbose": true,
+	"static_dir": "static",
+    "view_dir": "views",
+    "database": "postgres",
+	"automigrate": false
+}
