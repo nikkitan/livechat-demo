@@ -25,5 +25,6 @@ func NewLiveChatController() controller.Controller {
 //Home is responsible for rendering home page.
 func (c *LiveChatController) Home() {
 	fmt.Println("Home!")
+	c.Ctx.Template = "index"
 	c.HTML(http.StatusOK)
 }
