@@ -1,7 +1,7 @@
 {
 	"app_name": "livechat demo",
 	"base_url": "http://localhost",
-	"port": 80,
+	"port": 443,
 	"verbose": true,
 	"static_dir": "static",
     "view_dir": "views",
