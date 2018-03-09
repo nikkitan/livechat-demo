@@ -56,6 +56,6 @@ func (c *LiveChatController) Welcome() {
 		c.Ctx.Template = "error"
 		return
 	}
-	c.Ctx.Write([]byte("challenge"))
+	c.Ctx.Write([]byte(req.Form.Get("challenge")))
 	c.HTML(http.StatusOK)
 }
