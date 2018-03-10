@@ -72,6 +72,7 @@ func (c *LiveChatController) Welcome() {
 		c.Ctx.Template = "error"
 		return
 	}
+	fmt.Printf("[HEADER]: %+v\n", req.Header)
 	fmt.Printf("[FORM]: %+v\n", req.Form)
 	c.HTML(http.StatusOK)
 }
