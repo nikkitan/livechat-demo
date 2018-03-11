@@ -19,8 +19,10 @@ func NewLiveChatController() controller.Controller {
 		Routes: []string{
 			"get;/;Home",
 			"get;/botengine/prohibiteditems;ProhibitedItems",
-			"get;/botengine/welcome;VerifyWelcome",
+			"get;/botengine/welcome;VerifyWebhook",
 			"post;/botengine/welcome;Welcome",
+			"get;/botengine/appcrashing;VerifyWebhook",
+			"post;/botengine/appcrashing;AppCrashing",
 		},
 	}
 }
@@ -32,6 +34,22 @@ func (c *LiveChatController) Home() {
 	c.HTML(http.StatusOK)
 }
 
+// AppCrashing is webhook for when the user asks about prohibited items.
+func (c *LiveChatController) AppCrashing() {
+	fmt.Println("AppCrashing!")
+	req := c.Ctx.Request()
+	err := req.ParseForm()
+	if err != nil {
+		fmt.Println("[ERR]: " + err.Error())
+		c.HTML(http.StatusBadRequest)
+		c.Ctx.Template = "error"
+		return
+	}
+	fmt.Printf("[HEADER]: %+v\n", req.Header)
+	fmt.Printf("[FORM]: %+v\n", req.Form)
+	c.HTML(http.StatusOK)
+}
+
 // ProhibitedItems is webhook for when the user asks about prohibited items.
 func (c *LiveChatController) ProhibitedItems() {
 	fmt.Println("Welcome!")
@@ -39,8 +57,8 @@ func (c *LiveChatController) ProhibitedItems() {
 	c.HTML(http.StatusOK)
 }
 
-// VerifyWelcome is called when we first verify the webhook for Welcome interaction.
-func (c *LiveChatController) VerifyWelcome() {
+// VerifyWebhook is called when we first verify a webhook for registering it.
+func (c *LiveChatController) VerifyWebhook() {
 	fmt.Println("VerifyWelcome!")
 	req := c.Ctx.Request()
 	err := req.ParseForm()
