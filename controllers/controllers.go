@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gernest/utron/controller"
@@ -38,7 +40,17 @@ func (c *LiveChatController) Home() {
 func (c *LiveChatController) AppCrashing() {
 	fmt.Println("AppCrashing!")
 	req := c.Ctx.Request()
-	err := req.ParseForm()
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("Error reading body: %v", err)
+		return
+	}
+
+	// Work / inspect body. You may even modify it!
+
+	// And now set a new body, which will simulate the same data we read:
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	err = req.ParseForm()
 	if err != nil {
 		fmt.Println("[ERR]: " + err.Error())
 		c.HTML(http.StatusBadRequest)
@@ -47,7 +59,17 @@ func (c *LiveChatController) AppCrashing() {
 	}
 	fmt.Printf("[HEADER]: %+v\n", req.Header)
 	fmt.Printf("[FORM]: %+v\n", req.Form)
+	fmt.Printf("[REQ]: %+v\n", req)
+	fmt.Printf("[REQ_BODY]: %+v\n", req.Body)
+
 	c.HTML(http.StatusOK)
+	w := c.Ctx.Response()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{\"test\":\"test\"}"))
+	fmt.Printf("[CTX]: %+v\n", c.Ctx)
+	fmt.Printf("[RESP]: %+v\n", c.Ctx.Data)
+
 }
 
 // ProhibitedItems is webhook for when the user asks about prohibited items.
