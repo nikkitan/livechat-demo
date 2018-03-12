@@ -9,35 +9,35 @@ import (
 	"github.com/gernest/utron/controller"
 )
 
-// LiveChatController is for controllers of livechat-demo.
-type LiveChatController struct {
+// ChatWgtController is for controllers of livechat-demo.
+type ChatWgtController struct {
 	controller.BaseController
 	Routes []string
 }
 
-// NewLiveChatController is the constructor of LivChatController.
-func NewLiveChatController() controller.Controller {
-	return &LiveChatController{
+// NewChatWgtController is the constructor of LivChatController.
+func NewChatWgtController() controller.Controller {
+	return &ChatWgtController{
 		Routes: []string{
-			"get;/;Home",
-			"get;/botengine/prohibiteditems;ProhibitedItems",
-			"get;/botengine/welcome;VerifyWebhook",
-			"post;/botengine/welcome;Welcome",
-			"get;/botengine/appcrashing;VerifyWebhook",
-			"post;/botengine/appcrashing;AppCrashing",
+			"get;/chatwgt/chatwgt_home;Home",
+			"get;/chatwgt/prohibiteditems;ProhibitedItems",
+			"get;/chatwgt/welcome;VerifyWebhook",
+			"post;/chatwgt/welcome;Welcome",
+			"get;/chatwgt/appcrashing;VerifyWebhook",
+			"post;/chatwgt/appcrashing;AppCrashing",
 		},
 	}
 }
 
 //Home is responsible for rendering home page.
-func (c *LiveChatController) Home() {
+func (c *ChatWgtController) Home() {
 	fmt.Println("Home!")
-	c.Ctx.Template = "index"
+	c.Ctx.Template = "chatwgt_home"
 	c.HTML(http.StatusOK)
 }
 
 // AppCrashing is webhook for when the user asks about prohibited items.
-func (c *LiveChatController) AppCrashing() {
+func (c *ChatWgtController) AppCrashing() {
 	fmt.Println("AppCrashing!")
 	req := c.Ctx.Request()
 	body, err := ioutil.ReadAll(req.Body)
@@ -67,20 +67,19 @@ func (c *LiveChatController) AppCrashing() {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{\"test\":\"test\"}"))
-	fmt.Printf("[CTX]: %+v\n", c.Ctx)
-	fmt.Printf("[RESP]: %+v\n", c.Ctx.Data)
+	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
 
 }
 
 // ProhibitedItems is webhook for when the user asks about prohibited items.
-func (c *LiveChatController) ProhibitedItems() {
+func (c *ChatWgtController) ProhibitedItems() {
 	fmt.Println("Welcome!")
 	c.Ctx.Template = "index"
 	c.HTML(http.StatusOK)
 }
 
 // VerifyWebhook is called when we first verify a webhook for registering it.
-func (c *LiveChatController) VerifyWebhook() {
+func (c *ChatWgtController) VerifyWebhook() {
 	fmt.Println("VerifyWelcome!")
 	req := c.Ctx.Request()
 	err := req.ParseForm()
@@ -102,7 +101,7 @@ func (c *LiveChatController) VerifyWebhook() {
 }
 
 // Welcome is responsible for getting user info when the Bot first welcomed the user.
-func (c *LiveChatController) Welcome() {
+func (c *ChatWgtController) Welcome() {
 	fmt.Println("Welcome!")
 	req := c.Ctx.Request()
 	err := req.ParseForm()

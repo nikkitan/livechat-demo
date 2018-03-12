@@ -10,17 +10,16 @@ import (
 )
 
 func main() {
-
-	// Start the MVC App
 	app, err := utron.NewMVC()
+	port := fmt.Sprintf(":%d", app.Config.Port)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Register Controller
+	app.AddController(c.NewCommonController)
 	app.AddController(c.NewLiveChatController)
+	app.AddController(c.NewChatWgtController)
 
-	// Start the server
-	port := fmt.Sprintf(":%d", app.Config.Port)
 	log.Fatal(http.ListenAndServe(port, app))
 }
