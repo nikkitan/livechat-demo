@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gernest/utron/controller"
 )
@@ -65,8 +67,44 @@ func (c *LiveChatController) AppCrashing() {
 	c.HTML(http.StatusOK)
 	w := c.Ctx.Response()
 
+	type p struct {
+		ItemID string `json:"itemid"`
+		Name   string `json:"name"`
+		Email  string `json:"email"`
+	}
+
+	type r struct {
+		Type     string   `json:"type"`
+		Elements []string `json:"elements"`
+	}
+
+	var result struct {
+		Responses  []r `json:"responses"`
+		Parameters p   `json:"parameters"`
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{\"test\":\"test\"}"))
+	result.Responses = []r{
+		{
+			Type:     "text",
+			Elements: []string{"Is your name {{name}}?"},
+		},
+	}
+	result.Parameters.ItemID = "1234567890"
+	result.Parameters.Name = "nikkitan"
+	result.Parameters.Email = "nikkitan+222@mercari.com"
+
+	fmt.Printf("[JSON]: %+v.\n", result)
+
+	json.NewEncoder(os.Stdout).Encode(result)
+
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
+	}
+
+	fmt.Println("[DONE_JSON]")
+
 	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
 
 }
