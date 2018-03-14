@@ -48,9 +48,6 @@ func (c *LiveChatController) AppCrashing() {
 		return
 	}
 
-	// Work / inspect body. You may even modify it!
-
-	// And now set a new body, which will simulate the same data we read:
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	err = req.ParseForm()
 	if err != nil {
@@ -73,18 +70,18 @@ func (c *LiveChatController) AppCrashing() {
 		Email  string `json:"email"`
 	}
 
-	type r struct {
+	type response struct {
 		Type     string   `json:"type"`
 		Elements []string `json:"elements"`
 	}
 
 	var result struct {
-		Responses  []r `json:"responses"`
-		Parameters p   `json:"parameters"`
+		Responses  []response `json:"responses"`
+		Parameters p          `json:"parameters"`
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	result.Responses = []r{
+	result.Responses = []response{
 		{
 			Type:     "text",
 			Elements: []string{"Is your name {{name}}?"},
