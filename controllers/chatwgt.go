@@ -33,6 +33,8 @@ func NewChatWgtController() controller.Controller {
 			"post;/chatwgt/getsolditems;GetSoldItemsAsCards",
 			"get;/chatwgt/other;VerifyWebhook",
 			"post;/chatwgt/other;Other",
+			"get;/chatwgt/itemops;VerifyWebhook",
+			"post;/chatwgt/itemops;GenerateItemOpQuickReplies",
 			"get;/chatwgt/itemstat;VerifyWebhook",
 			"post;/chatwgt/itemstat;GetItemStatus",
 			"get;/chatwgt/return;VerifyWebhook",
@@ -45,14 +47,12 @@ func NewChatWgtController() controller.Controller {
 
 //Home is responsible for rendering home page.
 func (c *ChatWgtController) Home() {
-	fmt.Println("Home!")
 	c.Ctx.Template = "chatwgt_home"
 	c.HTML(http.StatusOK)
 }
 
 //GetItemStatus is responsible for rendering home page.
 func (c *ChatWgtController) GetItemStatus() {
-	fmt.Println("GetItemStatus!")
 	req := c.Ctx.Request()
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -118,7 +118,6 @@ func (c *ChatWgtController) GetItemStatus() {
 
 // AppCrashing is webhook for when the user asks about prohibited items.
 func (c *ChatWgtController) AppCrashing() {
-	fmt.Println("AppCrashing!")
 	req := c.Ctx.Request()
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -150,7 +149,6 @@ func (c *ChatWgtController) AppCrashing() {
 
 // VerifyWebhook is called when we first verify a webhook for registering it.
 func (c *ChatWgtController) VerifyWebhook() {
-	fmt.Println("VerifyWelcome!")
 	req := c.Ctx.Request()
 	err := req.ParseForm()
 	if err != nil {
@@ -172,7 +170,6 @@ func (c *ChatWgtController) VerifyWebhook() {
 
 // Welcome is responsible for getting user info when the Bot first welcomed the user.
 func (c *ChatWgtController) Welcome() {
-	fmt.Println("Welcome!")
 	req := c.Ctx.Request()
 	err := req.ParseForm()
 	if err != nil {
@@ -183,6 +180,180 @@ func (c *ChatWgtController) Welcome() {
 	}
 	fmt.Printf("[HEADER]: %+v\n", req.Header)
 	fmt.Printf("[FORM]: %+v\n", req.Form)
+	c.HTML(http.StatusOK)
+}
+
+// GenerateItemOpQuickReplies constructs and returns a BotEngine's Quick-Replies GUI obj
+// with proper data and wiring with other iteractions.
+// Request Parameters:  item ID.
+// Return: A Quick-Replies object for the bot to display.
+func (c *ChatWgtController) GenerateItemOpQuickReplies() {
+	fmt.Println("GenerateItemOpQuickReplies!")
+	req := c.Ctx.Request()
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("Error reading body: %v", err)
+		return
+	}
+	//TODO: Parse the JSON in body.
+
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+	err = req.ParseForm()
+
+	if err != nil {
+		fmt.Println("[ERR]: " + err.Error())
+		c.HTML(http.StatusBadRequest)
+		c.Ctx.Template = "error"
+		return
+	}
+
+	//Generate the Quick Replies.
+	type p struct {
+		ItemID string `json:"current_item_id"`
+	}
+
+	type response struct {
+		Type    string   `json:"type"`
+		Title   string   `json:"title"`
+		Buttons []Button `json:"buttons"`
+	}
+
+	var result struct {
+		Responses  []response `json:"responses"`
+		Parameters p          `json:"parameters"`
+	}
+	w := c.Ctx.Response()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	result.Responses = []response{
+		{
+			Type:  "quickReplies",
+			Title: "Please pick what you want to do for the item:",
+			Buttons: []Button{
+				{
+					Type:  Goto,
+					Title: "Item Status",
+					Value: "5aa833dcf60bd80007b25375",
+				}, {
+					Type:  Goto,
+					Title: "Cancel Item",
+					Value: "5aa83bcbf60bd80007b253e3",
+				}, {
+					Type:  Goto,
+					Title: "Return Item",
+					Value: "5aa83bbd7eefe000078cb066",
+				},
+			},
+		},
+	}
+
+	result.Parameters.ItemID = "fakeitem1111"
+
+	fmt.Printf("[JSON]: %+v.\n", result)
+
+	json.NewEncoder(os.Stdout).Encode(result)
+
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
+	}
+
+	fmt.Println("[DONE_JSON]")
+	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
+	c.HTML(http.StatusOK)
+
+}
+
+// GetSoldItemsAsCards gets the purchased or sold items for a user.
+// Request Parameters:  user's first name
+//						user's last name
+//						user's email.
+// Return: A Cards object for the bot to display.
+func (c *ChatWgtController) GetSoldItemsAsCards() {
+	fmt.Println("GetSoldItemsAsCards!")
+	req := c.Ctx.Request()
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("Error reading body: %v", err)
+		return
+	}
+
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+	err = req.ParseForm()
+
+	if err != nil {
+		fmt.Println("[ERR]: " + err.Error())
+		c.HTML(http.StatusBadRequest)
+		c.Ctx.Template = "error"
+		return
+	}
+	fmt.Printf("[REQ_BODY]: %+v\n", req.Body)
+
+	//TODO: SYNCHRONOUS call to Mercari backend for the items of current user.
+
+	// Return the list of items as Cards.
+	type p struct {
+		ItemID string `json:"itemid"`
+		Name   string `json:"name"`
+		Email  string `json:"email"`
+	}
+
+	type response struct {
+		Type     string `json:"type"`
+		Elements []Card `json:"elements"`
+	}
+
+	var result struct {
+		Responses []response `json:"responses"`
+	}
+
+	w := c.Ctx.Response()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	result.Responses = []response{
+		{
+			Type: "cards",
+			Elements: []Card{
+				{
+					Title:    "Mario Chess",
+					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
+					Buttons: []Button{
+						{
+							Type:  Postback,
+							Title: "Item Operations",
+							Value: "fakeitemid1111",
+						},
+					},
+				}, {
+					Title:    "Nike Air",
+					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
+					Buttons: []Button{
+						{
+							Type:  Postback,
+							Title: "Item Operations",
+							Value: "fakeitemid2222",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	fmt.Printf("[JSON]: %+v.\n", result)
+
+	json.NewEncoder(os.Stdout).Encode(result)
+
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
+	}
+
+	fmt.Println("[DONE_JSON]")
+	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
 	c.HTML(http.StatusOK)
 }
 
@@ -244,7 +415,7 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 					Buttons: []Button{
 						{
 							Type:  Postback,
-							Title: "Item Status",
+							Title: "Item Operations",
 							Value: "fakeitemid1111",
 						},
 					},
@@ -254,7 +425,7 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 					Buttons: []Button{
 						{
 							Type:  Postback,
-							Title: "Item Status",
+							Title: "Item Operations",
 							Value: "fakeitemid2222",
 						},
 					},
