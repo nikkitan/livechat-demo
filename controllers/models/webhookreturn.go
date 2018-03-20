@@ -1,4 +1,5 @@
-package controllers
+// Package models has the data models that are common among all inputs that BotEngine send to our webhooks.
+package models
 
 // Card is for when we want to return a "Cards" object to be displayed in the bot.
 type Card struct {

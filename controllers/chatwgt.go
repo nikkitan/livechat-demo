@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/gernest/utron/controller"
+	"github.com/nikkitan/livechat-demo/controllers/models"
 )
 
 // ChatWgtController is for controllers of livechat-demo.
@@ -41,6 +42,8 @@ func NewChatWgtController() controller.Controller {
 			"post;/chatwgt/return;RequestReturn",
 			"get;/chatwgt/cancel;VerifyWebhook",
 			"post;/chatwgt/cancel;CancelItem",
+			"get;/chatwgt/getsingleitem;VerifyWebhook",
+			"post;/chatwgt/getsingleitem;GetSelectedItemCard",
 		},
 	}
 }
@@ -51,8 +54,16 @@ func (c *ChatWgtController) Home() {
 	c.HTML(http.StatusOK)
 }
 
+//Test is responsible for rendering home page.
+func (c *ChatWgtController) Test() {
+	fmt.Println("Test!")
+	c.HTML(http.StatusOK)
+}
+
 //GetItemStatus is responsible for rendering home page.
 func (c *ChatWgtController) GetItemStatus() {
+	fmt.Println("GetItemStatus!")
+
 	req := c.Ctx.Request()
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -198,6 +209,7 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 	//TODO: Parse the JSON in body.
 
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	fmt.Printf("[REQ_BODY]: %+v\n", req.Body)
 
 	err = req.ParseForm()
 
@@ -208,15 +220,15 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		return
 	}
 
-	//Generate the Quick Replies.
+	// Generate the Quick Replies.
 	type p struct {
 		ItemID string `json:"current_item_id"`
 	}
 
 	type response struct {
-		Type    string   `json:"type"`
-		Title   string   `json:"title"`
-		Buttons []Button `json:"buttons"`
+		Type    string          `json:"type"`
+		Title   string          `json:"title"`
+		Buttons []models.Button `json:"buttons"`
 	}
 
 	var result struct {
@@ -231,17 +243,17 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		{
 			Type:  "quickReplies",
 			Title: "Please pick what you want to do for the item:",
-			Buttons: []Button{
+			Buttons: []models.Button{
 				{
-					Type:  Goto,
+					Type:  models.Goto,
 					Title: "Item Status",
 					Value: "5aa833dcf60bd80007b25375",
 				}, {
-					Type:  Goto,
+					Type:  models.Goto,
 					Title: "Cancel Item",
 					Value: "5aa83bcbf60bd80007b253e3",
 				}, {
-					Type:  Goto,
+					Type:  models.Goto,
 					Title: "Return Item",
 					Value: "5aa83bbd7eefe000078cb066",
 				},
@@ -263,7 +275,6 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 	fmt.Println("[DONE_JSON]")
 	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
 	c.HTML(http.StatusOK)
-
 }
 
 // GetSoldItemsAsCards gets the purchased or sold items for a user.
@@ -302,8 +313,8 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 	}
 
 	type response struct {
-		Type     string `json:"type"`
-		Elements []Card `json:"elements"`
+		Type     string        `json:"type"`
+		Elements []models.Card `json:"elements"`
 	}
 
 	var result struct {
@@ -317,25 +328,33 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 	result.Responses = []response{
 		{
 			Type: "cards",
-			Elements: []Card{
+			Elements: []models.Card{
 				{
 					Title:    "Mario Chess",
 					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
-					Buttons: []Button{
+					Buttons: []models.Button{
 						{
-							Type:  Postback,
+							Type:  models.Postback,
 							Title: "Item Operations",
 							Value: "fakeitemid1111",
+						}, {
+							Type:  models.Postback,
+							Title: "Mario Chess",
+							Value: "Item Name%Mario Chess",
 						},
 					},
 				}, {
 					Title:    "Nike Air",
 					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
-					Buttons: []Button{
+					Buttons: []models.Button{
 						{
-							Type:  Postback,
+							Type:  models.Postback,
 							Title: "Item Operations",
 							Value: "fakeitemid2222",
+						}, {
+							Type:  models.Postback,
+							Title: "Nike Air",
+							Value: "Item Name%Nike Air",
 						},
 					},
 				},
@@ -393,8 +412,8 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 	}
 
 	type response struct {
-		Type     string `json:"type"`
-		Elements []Card `json:"elements"`
+		Type     string        `json:"type"`
+		Elements []models.Card `json:"elements"`
 	}
 
 	var result struct {
@@ -408,25 +427,33 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 	result.Responses = []response{
 		{
 			Type: "cards",
-			Elements: []Card{
+			Elements: []models.Card{
 				{
 					Title:    "Mario Chess",
 					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
-					Buttons: []Button{
+					Buttons: []models.Button{
 						{
-							Type:  Postback,
+							Type:  models.Postback,
 							Title: "Item Operations",
 							Value: "fakeitemid1111",
+						}, {
+							Type:  models.Postback,
+							Title: "Mario Chess",
+							Value: "Item Name%Mario Chess",
 						},
 					},
 				}, {
 					Title:    "Nike Air",
 					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
-					Buttons: []Button{
+					Buttons: []models.Button{
 						{
-							Type:  Postback,
+							Type:  models.Postback,
 							Title: "Item Operations",
 							Value: "fakeitemid2222",
+						}, {
+							Type:  models.Postback,
+							Title: "Nike Air",
+							Value: "Item Name%Nike Air",
 						},
 					},
 				},
@@ -448,89 +475,124 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 	c.HTML(http.StatusOK)
 }
 
-// GetItemsAsCards gets the purchased or sold items for a user.
-// Request Parameters:  user's first name
-//						user's last name
-//						user's email.
-//						"purchased" or "sold".
-// Return: A Cards object for the bot to display.
-func (c *ChatWgtController) GetItemsAsCards() {
-	fmt.Println("GetItemsAsCards!")
+// GetSelectedItemCard gets the selected item's info from backend
+// and generates a Card object for it.
+// Request Parameters:  item ID
+// Return: A Cards object for the bot GetSelectedItemCardto display.
+func (c *ChatWgtController) GetSelectedItemCard() {
+	fmt.Println("GetSelectedItemCard!")
 	req := c.Ctx.Request()
-	err := req.ParseForm()
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("Error reading body: %v", err)
+		return
+	}
+	//TODO: Parse the JSON in body.
+	type contextParameters struct {
+		DefaultURL       string `json:"default_url"`
+		Any              string `json:"any, omitempty"`
+		DefaultEMail     string `json:"default_email"`
+		DefaultFirstname string `json:"default_username"`
+		DefaultLastname  string `json:"default_lastname"`
+	}
+
+	type context struct {
+		ID         string            `json:"id, omitempty"`
+		Name       string            `json:"name, omitempty"`
+		Parameters contextParameters `json:"parameters"`
+	}
+
+	type result struct {
+		Source        string               `json:"source"`
+		ResolvedQuery string               `json:"resolvedQuery"`
+		Goto          string               `json:"goto"`
+		Confidence    int                  `json:"confidence"`
+		Score         int                  `json:"score"`
+		LifeSpan      int                  `json:"lifespan"`
+		Incomplete    bool                 `json:"incomplete"`
+		StoryID       string               `json:"storeId"`
+		Interaction   models.Interaction   `json:"interaction"`
+		Parameters    models.Parameters    `json:"parameters"`
+		Contexts      []context            `json:"contexts"`
+		Fulfillment   []models.Fulfillment `json:"fulfillment"`
+	}
+
+	var webhookInput struct {
+		Timestamp string        `json:"timestamp"`
+		SessionID string        `json:"sessionId"`
+		Result    result        `json:"result"`
+		Status    models.Status `json:"status"`
+	}
+
+	if err = json.Unmarshal(body, &webhookInput); err != nil {
+		fmt.Printf("[JSON_ERR]: %s.\n", err.Error())
+		c.HTML(http.StatusInternalServerError)
+		return
+	}
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+	err = req.ParseForm()
+
 	if err != nil {
 		fmt.Println("[ERR]: " + err.Error())
 		c.HTML(http.StatusBadRequest)
 		c.Ctx.Template = "error"
 		return
 	}
-	//TODO: synchronous call to Mercari backend for the items of current user.
 
-	// Return the list of items as Cards.
+	// TODO: get item's data from backend by passing item ID to the backend.
+
+	//Generate the Quick Replies.
 	type p struct {
-		ItemID string `json:"itemid"`
-		Name   string `json:"name"`
-		Email  string `json:"email"`
+		ItemID string `json:"current_item_id"`
 	}
 
+	// A Card object.
 	type response struct {
-		Type     string `json:"type"`
-		Elements []Card `json:"elements"`
+		Type     string          `json:"type"`
+		Title    string          `json:"title"`
+		Subtitle string          `json:"subtitle"`
+		ImageURL string          `json:"imageUrl"`
+		Buttons  []models.Button `json:"buttons"`
 	}
 
-	var result struct {
-		Responses  []response `json:"responses"`
-		Parameters p          `json:"parameters"`
+	var card struct {
+		Responses []response `json:"responses"`
+		//Parameters p          `json:"parameters"`
 	}
 
 	w := c.Ctx.Response()
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var buttons = []Button{
+	card.Responses = []response{
 		{
-			Type:  Goto,
-			Title: "Where is my item?",
-			Value: "5aa833dcf60bd80007b25375",
-		}, {
-			Type:  Goto,
-			Title: "Request return",
-			Value: "5aa83bbd7eefe000078cb066",
-		}, {
-			Type:  Goto,
-			Title: "Cancel order",
-			Value: "5aa83bcbf60bd80007b253e3",
-		},
-	}
+			Type:  "card",
+			Title: "Mario Chess",
 
-	result.Responses = []response{
-		{
-			Type: "cards",
-			Elements: []Card{
+			Buttons: []models.Button{
 				{
-					Title:    "Mario Chess",
-					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
-					Buttons:  buttons,
+					Type:  models.Goto,
+					Title: "Item Status",
+					Value: "5aa833dcf60bd80007b25375",
 				}, {
-					Title:    "Nike Air",
-					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
-					Buttons:  buttons,
+					Type:  models.Goto,
+					Title: "Cancel Item",
+					Value: "5aa83bcbf60bd80007b253e3",
 				}, {
-					Title:    "Nike Air",
-					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
-					Buttons:  buttons,
+					Type:  models.Goto,
+					Title: "Return Item",
+					Value: "5aa83bbd7eefe000078cb066",
 				},
 			},
 		},
 	}
 
-	result.Parameters.ItemID = "1234567890"
+	fmt.Printf("[JSON]: %+v.\n", card)
 
-	fmt.Printf("[JSON]: %+v.\n", result)
+	json.NewEncoder(os.Stdout).Encode(card)
 
-	json.NewEncoder(os.Stdout).Encode(result)
-
-	err = json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(card)
 	if err != nil {
 		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
 	}
@@ -538,7 +600,6 @@ func (c *ChatWgtController) GetItemsAsCards() {
 	fmt.Println("[DONE_JSON]")
 	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
 	c.HTML(http.StatusOK)
-
 }
 
 // ItemCurrentStatus is the webhook for getting current status of an item.
