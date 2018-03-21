@@ -88,13 +88,20 @@ func (c *ChatWgtController) GetItemStatus() {
 	w := c.Ctx.Response()
 
 	//TODO: SYNCHRONOUS call to Mercari backend for the items of current user.
+	type p struct {
+		ItemID     string `json:"current_item_id"`
+		ItemImgURL string `json:"selected_img_url"`
+		ItemName   string `json:"selected_item_name"`
+	}
+
 	type response struct {
 		Type     string   `json:"type"`
 		Elements []string `json:"elements"`
 	}
 
 	var result struct {
-		Responses []response `json:"responses"`
+		Responses  []response `json:"responses"`
+		Parameters p          `json:"parameters"`
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -111,6 +118,11 @@ func (c *ChatWgtController) GetItemStatus() {
 			},
 		},
 	}
+
+	result.Parameters.ItemID = "fakeitem1111"
+	result.Parameters.ItemImgURL = "https://image.ibb.co/hYWMXx/mariochess.jpg"
+	result.Parameters.ItemName = "Mario Chess"
+
 	fmt.Printf("[JSON]: %+v.\n", result)
 
 	json.NewEncoder(os.Stdout).Encode(result)
@@ -599,6 +611,8 @@ func (c *ChatWgtController) GetSelectedItemCard() {
 
 	fmt.Println("[DONE_JSON]")
 	fmt.Printf("[RESP]: %+v\n", c.Ctx.Response())
+
+	// Synchronous POST to trigger
 	c.HTML(http.StatusOK)
 }
 
