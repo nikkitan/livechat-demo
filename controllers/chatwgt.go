@@ -82,6 +82,7 @@ func (c *ChatWgtController) GetItemStatus() {
 		DefaultEMail     string `json:"default_email, omitempty"`
 		DefaultFirstname string `json:"default_username, omitempty"`
 		DefaultLastname  string `json:"default_lastname, omitempty"`
+		CurrentItemID    string `json:"current_item_id, omitempty"`
 	}
 
 	type context struct {
@@ -91,9 +92,8 @@ func (c *ChatWgtController) GetItemStatus() {
 	}
 
 	type parameters struct {
-		DefaultURL    string `json:"default_url"`
-		Any           string `json:"any"`
-		CurrentItemID string `json:"current_item_id"`
+		DefaultURL string `json:"default_url"`
+		Any        string `json:"any"`
 	}
 
 	type result struct {
@@ -122,6 +122,18 @@ func (c *ChatWgtController) GetItemStatus() {
 		fmt.Printf("[JSON_ERR]: %s.\n", err.Error())
 		c.HTML(http.StatusInternalServerError)
 		return
+	}
+
+	var currentItemID string
+	// Look for current_item_id.
+	for _, ctx := range webhookInput.Result.Contexts {
+		if ctx.Name == "Get and Display Single Item Ops" {
+			if ctx.Parameters.CurrentItemID != "" {
+				currentItemID = ctx.Parameters.CurrentItemID
+			} else {
+				fmt.Println("[ERROR]: Empty current item id.")
+			}
+		}
 	}
 
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
@@ -172,11 +184,11 @@ func (c *ChatWgtController) GetItemStatus() {
 		},
 	}
 
-	if webhookInput.Result.Parameters.CurrentItemID == "fakeitemid1111" {
+	if currentItemID == "fakeitemid1111" {
 		webhookResult.Parameters.ItemID = "fakeitemid1111"
 		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/hYWMXx/mariochess.jpg"
 		webhookResult.Parameters.ItemName = "Mario Chess"
-	} else if webhookInput.Result.Parameters.CurrentItemID == "fakeitemid2222" {
+	} else if currentItemID == "fakeitemid2222" {
 		webhookResult.Parameters.ItemID = "fakeitemid2222"
 		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/iUGoCx/nike.jpg"
 		webhookResult.Parameters.ItemName = "Nike Air"
