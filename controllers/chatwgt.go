@@ -398,7 +398,7 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 	if webhookInput.Result.Parameters.CurrentItemID != "" {
 		webhookResult.Parameters.ItemID = webhookInput.Result.Parameters.CurrentItemID
 	} else {
-		webhookInput.Result.Parameters.CurrentItemID = "fakeitemid0000"
+		webhookResult.Parameters.ItemID = "fakeitemid0000"
 	}
 
 	fmt.Printf("[JSON]: %+v.\n", webhookResult)
@@ -476,9 +476,9 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 							Title: "Item Operations",
 							Value: "fakeitemid1111",
 						}, {
-							Type:  models.Postback,
-							Title: "Mario Chess",
-							Value: "Item Name%Mario Chess",
+							Type:  models.Goto,
+							Title: "Talk to Agent",
+							Value: "5aaffe7c9cef610007d536ed",
 						},
 					},
 				}, {
@@ -490,9 +490,9 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 							Title: "Item Operations",
 							Value: "fakeitemid2222",
 						}, {
-							Type:  models.Postback,
-							Title: "Nike Air",
-							Value: "Item Name%Nike Air",
+							Type:  models.Goto,
+							Title: "Talk to Agent",
+							Value: "5aaffe7c9cef610007d536ed",
 						},
 					},
 				},
@@ -575,9 +575,9 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 							Title: "Item Operations",
 							Value: "fakeitemid1111",
 						}, {
-							Type:  models.Postback,
-							Title: "Mario Chess",
-							Value: "Item Name%Mario Chess",
+							Type:  models.Goto,
+							Title: "Talk to Agent",
+							Value: "5aaffe7c9cef610007d536ed",
 						},
 					},
 				}, {
@@ -589,9 +589,9 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 							Title: "Item Operations",
 							Value: "fakeitemid2222",
 						}, {
-							Type:  models.Postback,
-							Title: "Nike Air",
-							Value: "Item Name%Nike Air",
+							Type:  models.Goto,
+							Title: "Talk to Agent",
+							Value: "5aaffe7c9cef610007d536ed",
 						},
 					},
 				},
