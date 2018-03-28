@@ -180,6 +180,10 @@ func (c *ChatWgtController) GetItemStatus() {
 		webhookResult.Parameters.ItemID = "fakeitemid2222"
 		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/iUGoCx/nike.jpg"
 		webhookResult.Parameters.ItemName = "Nike Air"
+	} else {
+		webhookResult.Parameters.ItemID = "fakeitemid0000"
+		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/iEk0H7/Broken_Image.png"
+		webhookResult.Parameters.ItemName = "Unknown Item"
 	}
 
 	fmt.Printf("[JSON]: %+v.\n", webhookResult)
