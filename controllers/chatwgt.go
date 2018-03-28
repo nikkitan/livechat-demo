@@ -91,7 +91,7 @@ func (c *ChatWgtController) GetItemStatus() {
 	type p struct {
 		ItemID     string `json:"current_item_id"`
 		ItemImgURL string `json:"selected_img_url"`
-		ItemName   string `json:"selected_item_name"`
+		ItemName   string `json:"curr_item_name"`
 	}
 
 	type response struct {
