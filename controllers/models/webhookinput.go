@@ -16,9 +16,10 @@ type Parameters struct {
 
 // Fulfillment is for "fulfillment".
 type Fulfillment struct {
-	Type    string `json:"text"`
-	Delay   int    `json:"delay"`
-	Message string `json:"message"`
+	Type      string `json:"text"`
+	Delay     int    `json:"delay, omitempty"`
+	Message   string `json:"message, omitempty"`
+	WebhookID string `json:"webhookId, omitempty"`
 }
 
 // Status is for the "status" object in what BotEngine feeds our webhooks.

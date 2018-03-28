@@ -61,6 +61,11 @@ func (c *ChatWgtController) Test() {
 }
 
 //GetItemStatus is responsible for rendering home page.
+// Request Parameters:  item ID.
+// Return: Bot responses as Text objects filled with item info.
+//		   current_item_id to be displayed to the user.
+//         curr_item_name to be displayed to the user.
+//         selected_img_url to be displayed to the user.
 func (c *ChatWgtController) GetItemStatus() {
 	fmt.Println("GetItemStatus!")
 
@@ -68,6 +73,54 @@ func (c *ChatWgtController) GetItemStatus() {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("Error reading body: %v", err)
+		return
+	}
+
+	type contextParameters struct {
+		DefaultURL       string `json:"default_url"`
+		Any              string `json:"any, omitempty"`
+		DefaultEMail     string `json:"default_email, omitempty"`
+		DefaultFirstname string `json:"default_username, omitempty"`
+		DefaultLastname  string `json:"default_lastname, omitempty"`
+	}
+
+	type context struct {
+		ID         string            `json:"id, omitempty"`
+		Name       string            `json:"name, omitempty"`
+		Parameters contextParameters `json:"parameters"`
+	}
+
+	type parameters struct {
+		DefaultURL    string `json:"default_url"`
+		Any           string `json:"any"`
+		CurrentItemID string `json:"current_item_id"`
+	}
+
+	type result struct {
+		Source        string               `json:"source"`
+		ResolvedQuery string               `json:"resolvedQuery"`
+		Goto          string               `json:"goto"`
+		Confidence    int                  `json:"confidence"`
+		Score         int                  `json:"score"`
+		LifeSpan      int                  `json:"lifespan"`
+		Incomplete    bool                 `json:"incomplete"`
+		StoryID       string               `json:"storeId"`
+		Interaction   models.Interaction   `json:"interaction"`
+		Parameters    parameters           `json:"parameters"`
+		Contexts      []context            `json:"contexts"`
+		Fulfillment   []models.Fulfillment `json:"fulfillment"`
+	}
+
+	var webhookInput struct {
+		Timestamp string        `json:"timestamp"`
+		SessionID string        `json:"sessionId"`
+		Result    result        `json:"result"`
+		Status    models.Status `json:"status"`
+	}
+
+	if err = json.Unmarshal(body, &webhookInput); err != nil {
+		fmt.Printf("[JSON_ERR]: %s.\n", err.Error())
+		c.HTML(http.StatusInternalServerError)
 		return
 	}
 
@@ -99,13 +152,13 @@ func (c *ChatWgtController) GetItemStatus() {
 		Elements []string `json:"elements"`
 	}
 
-	var result struct {
+	var webhookResult struct {
 		Responses  []response `json:"responses"`
 		Parameters p          `json:"parameters"`
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	result.Responses = []response{
+	webhookResult.Responses = []response{
 		{
 			Type: "text",
 			Elements: []string{
@@ -119,15 +172,21 @@ func (c *ChatWgtController) GetItemStatus() {
 		},
 	}
 
-	result.Parameters.ItemID = "fakeitem1111"
-	result.Parameters.ItemImgURL = "https://image.ibb.co/hYWMXx/mariochess.jpg"
-	result.Parameters.ItemName = "Mario Chess"
+	if webhookInput.Result.Parameters.CurrentItemID == "fakeitemid1111" {
+		webhookResult.Parameters.ItemID = "fakeitemid1111"
+		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/hYWMXx/mariochess.jpg"
+		webhookResult.Parameters.ItemName = "Mario Chess"
+	} else if webhookInput.Result.Parameters.CurrentItemID == "fakeitemid2222" {
+		webhookResult.Parameters.ItemID = "fakeitemid2222"
+		webhookResult.Parameters.ItemImgURL = "https://image.ibb.co/iUGoCx/nike.jpg"
+		webhookResult.Parameters.ItemName = "Nike Air"
+	}
 
-	fmt.Printf("[JSON]: %+v.\n", result)
+	fmt.Printf("[JSON]: %+v.\n", webhookResult)
 
-	json.NewEncoder(os.Stdout).Encode(result)
+	json.NewEncoder(os.Stdout).Encode(webhookResult)
 
-	err = json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(webhookResult)
 	if err != nil {
 		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
 	}
@@ -273,7 +332,7 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		},
 	}
 
-	result.Parameters.ItemID = "fakeitem1111"
+	result.Parameters.ItemID = "fakeitemid1111"
 
 	fmt.Printf("[JSON]: %+v.\n", result)
 
