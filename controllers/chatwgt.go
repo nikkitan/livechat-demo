@@ -293,7 +293,54 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		fmt.Printf("Error reading body: %v", err)
 		return
 	}
-	//TODO: Parse the JSON in body.
+
+	type contextParameters struct {
+		DefaultURL       string `json:"default_url"`
+		Any              string `json:"any, omitempty"`
+		DefaultEMail     string `json:"default_email"`
+		DefaultFirstname string `json:"default_username"`
+		DefaultLastname  string `json:"default_lastname"`
+	}
+
+	type parameters struct {
+		CurrentItemID string `json:"current_item_id, omitempty"`
+		DefaultURL    string `json:"default_url"`
+		Any           string `json:"any"`
+	}
+
+	type context struct {
+		ID         string            `json:"id, omitempty"`
+		Name       string            `json:"name, omitempty"`
+		Parameters contextParameters `json:"parameters"`
+	}
+
+	type result struct {
+		Source        string               `json:"source"`
+		ResolvedQuery string               `json:"resolvedQuery"`
+		Goto          string               `json:"goto"`
+		Confidence    float32              `json:"confidence"`
+		Score         int                  `json:"score"`
+		LifeSpan      int                  `json:"lifespan"`
+		Incomplete    bool                 `json:"incomplete"`
+		StoryID       string               `json:"storeId"`
+		Interaction   models.Interaction   `json:"interaction"`
+		Parameters    parameters           `json:"parameters"`
+		Contexts      []context            `json:"contexts"`
+		Fulfillment   []models.Fulfillment `json:"fulfillment"`
+	}
+
+	var webhookInput struct {
+		Timestamp string        `json:"timestamp"`
+		SessionID string        `json:"sessionId"`
+		Result    result        `json:"result"`
+		Status    models.Status `json:"status"`
+	}
+
+	if err = json.Unmarshal(body, &webhookInput); err != nil {
+		fmt.Printf("[JSON_ERR]: %s.\n", err.Error())
+		c.HTML(http.StatusInternalServerError)
+		return
+	}
 
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	fmt.Printf("[REQ_BODY]: %+v\n", req.Body)
@@ -318,7 +365,7 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		Buttons []models.Button `json:"buttons"`
 	}
 
-	var result struct {
+	var webhookResult struct {
 		Responses  []response `json:"responses"`
 		Parameters p          `json:"parameters"`
 	}
@@ -326,7 +373,7 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	result.Responses = []response{
+	webhookResult.Responses = []response{
 		{
 			Type:  "quickReplies",
 			Title: "Please pick what you want to do for the item:",
@@ -348,13 +395,17 @@ func (c *ChatWgtController) GenerateItemOpQuickReplies() {
 		},
 	}
 
-	result.Parameters.ItemID = "fakeitemid1111"
+	if webhookInput.Result.Parameters.CurrentItemID != "" {
+		webhookResult.Parameters.ItemID = webhookInput.Result.Parameters.CurrentItemID
+	} else {
+		webhookInput.Result.Parameters.CurrentItemID = "fakeitemid0000"
+	}
 
-	fmt.Printf("[JSON]: %+v.\n", result)
+	fmt.Printf("[JSON]: %+v.\n", webhookResult)
 
-	json.NewEncoder(os.Stdout).Encode(result)
+	json.NewEncoder(os.Stdout).Encode(webhookResult)
 
-	err = json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(webhookResult)
 	if err != nil {
 		fmt.Printf("[JSON_ERR]: %s\n", err.Error())
 	}
@@ -574,7 +625,7 @@ func (c *ChatWgtController) GetSelectedItemCard() {
 		fmt.Printf("Error reading body: %v", err)
 		return
 	}
-	//TODO: Parse the JSON in body.
+
 	type contextParameters struct {
 		DefaultURL       string `json:"default_url"`
 		Any              string `json:"any, omitempty"`
