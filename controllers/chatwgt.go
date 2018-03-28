@@ -100,7 +100,7 @@ func (c *ChatWgtController) GetItemStatus() {
 		Source        string               `json:"source"`
 		ResolvedQuery string               `json:"resolvedQuery"`
 		Goto          string               `json:"goto"`
-		Confidence    int                  `json:"confidence"`
+		Confidence    float32              `json:"confidence"`
 		Score         int                  `json:"score"`
 		LifeSpan      int                  `json:"lifespan"`
 		Incomplete    bool                 `json:"incomplete"`
@@ -577,7 +577,7 @@ func (c *ChatWgtController) GetSelectedItemCard() {
 		Source        string               `json:"source"`
 		ResolvedQuery string               `json:"resolvedQuery"`
 		Goto          string               `json:"goto"`
-		Confidence    int                  `json:"confidence"`
+		Confidence    float32              `json:"confidence"`
 		Score         int                  `json:"score"`
 		LifeSpan      int                  `json:"lifespan"`
 		Incomplete    bool                 `json:"incomplete"`
