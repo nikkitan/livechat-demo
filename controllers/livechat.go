@@ -34,6 +34,17 @@ func NewLiveChatController() controller.Controller {
 //Home is responsible for rendering home page.
 func (c *LiveChatController) Home() {
 	fmt.Println("Home!")
+	req := c.Ctx.Request()
+	err := req.ParseForm()
+	if err != nil {
+		fmt.Println("[ERR]: " + err.Error())
+		c.HTML(http.StatusBadRequest)
+		c.Ctx.Template = "error"
+		return
+	}
+	fmt.Printf("[HEADER]: %+v\n", req.Header)
+	fmt.Printf("[FORM]: %+v\n", req.Form)
+
 	c.Ctx.Template = "livechat_home"
 	c.HTML(http.StatusOK)
 }
