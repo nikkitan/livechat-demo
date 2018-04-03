@@ -472,13 +472,17 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
 					Buttons: []models.Button{
 						{
-							Type:  models.Postback,
+							Type:  models.Goto,
 							Title: "Item Operations",
-							Value: "fakeitemid1111",
+							Value: "5aac51c099ae7b00071bc72a",
 						}, {
 							Type:  models.Goto,
 							Title: "Talk to Agent",
 							Value: "5aaffe7c9cef610007d536ed",
+						}, {
+							Type:  models.Postback,
+							Title: "Mario Chess",
+							Value: "fakeitemid1111",
 						},
 					},
 				}, {
@@ -486,13 +490,17 @@ func (c *ChatWgtController) GetSoldItemsAsCards() {
 					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
 					Buttons: []models.Button{
 						{
-							Type:  models.Postback,
+							Type:  models.Goto,
 							Title: "Item Operations",
-							Value: "fakeitemid2222",
+							Value: "5aac51c099ae7b00071bc72a",
 						}, {
 							Type:  models.Goto,
 							Title: "Talk to Agent",
 							Value: "5aaffe7c9cef610007d536ed",
+						}, {
+							Type:  models.Postback,
+							Title: "Nike Air",
+							Value: "fakeitemid2222",
 						},
 					},
 				},
@@ -571,13 +579,17 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 					ImageURL: "https://image.ibb.co/hYWMXx/mariochess.jpg",
 					Buttons: []models.Button{
 						{
-							Type:  models.Postback,
+							Type:  models.Goto,
 							Title: "Item Operations",
-							Value: "fakeitemid1111",
+							Value: "5aac51c099ae7b00071bc72a",
 						}, {
 							Type:  models.Goto,
 							Title: "Talk to Agent",
 							Value: "5aaffe7c9cef610007d536ed",
+						}, {
+							Type:  models.Postback,
+							Title: "Mario Chess",
+							Value: "fakeitemid1111",
 						},
 					},
 				}, {
@@ -585,13 +597,17 @@ func (c *ChatWgtController) GetPurchasedItemsAsCards() {
 					ImageURL: "https://image.ibb.co/iUGoCx/nike.jpg",
 					Buttons: []models.Button{
 						{
-							Type:  models.Postback,
+							Type:  models.Goto,
 							Title: "Item Operations",
-							Value: "fakeitemid2222",
+							Value: "5aac51c099ae7b00071bc72a",
 						}, {
 							Type:  models.Goto,
 							Title: "Talk to Agent",
 							Value: "5aaffe7c9cef610007d536ed",
+						}, {
+							Type:  models.Postback,
+							Title: "Nike Air",
+							Value: "fakeitemid2222",
 						},
 					},
 				},
